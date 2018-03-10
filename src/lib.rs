@@ -1,4 +1,5 @@
 mod vec3;
+mod ray;
 
 #[cfg(test)]
 mod tests {
