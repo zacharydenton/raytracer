@@ -59,6 +59,18 @@ fn main() {
     };
     let radius = 0.5;
     let sphere = Sphere { center, radius };
+    let ground = Sphere {
+        center: Vec3 {
+            x: 0.0,
+            y: -100.5,
+            z: -1.0,
+        },
+        radius: 100.0
+    };
+
+    let world = World {
+        objects: vec![&sphere, &ground],
+    };
 
     for j in (0..resolution.1).rev() {
         for i in 0..resolution.0 {
@@ -68,7 +80,7 @@ fn main() {
                 origin: origin,
                 direction: lower_left + horizontal * u + vertical * v,
             };
-            let color = color(&r, &sphere) * 255.0;
+            let color = color(&r, &world) * 255.0;
             println!(
                 "{} {} {}",
                 color.x.round(),

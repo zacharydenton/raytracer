@@ -19,6 +19,10 @@ pub struct Sphere {
     pub radius: f64,
 }
 
+pub struct World<'a> {
+    pub objects: Vec<&'a Hitable>,
+}
+
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<Hit> {
         let oc = r.origin - self.center;
@@ -46,6 +50,15 @@ impl Hitable for Sphere {
             }
         }
         None
+    }
+}
+
+impl<'a> Hitable for World<'a> {
+    fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<Hit> {
+        self.objects
+            .iter()
+            .filter_map(|hitable| hitable.hit(r, tmin, tmax))
+            .min_by(|a, b| (a.t).partial_cmp(&b.t).unwrap())
     }
 }
 
