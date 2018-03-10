@@ -40,7 +40,7 @@ impl Vec3 {
     }
 }
 
-impl Add for Vec3 {
+impl Add<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn add(self, rhs: Self) -> Self {
@@ -48,6 +48,18 @@ impl Add for Vec3 {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,
+        }
+    }
+}
+
+impl Add<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn add(self, rhs: f64) -> Self {
+        Vec3 {
+            x: self.x + rhs,
+            y: self.y + rhs,
+            z: self.z + rhs,
         }
     }
 }
@@ -145,6 +157,23 @@ mod tests {
             Vec3 {
                 x: 1.0,
                 y: 4.0,
+                z: 4.0,
+            }
+        );
+    }
+
+    #[test]
+    fn can_be_added_to_scalar() {
+        let a = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        assert_eq!(
+            a + 1.0,
+            Vec3 {
+                x: 2.0,
+                y: 3.0,
                 z: 4.0,
             }
         );

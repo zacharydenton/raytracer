@@ -3,13 +3,17 @@ use vec3::Vec3;
 mod ray;
 use ray::Ray;
 
-fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> bool {
+fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin - center;
     let a = r.direction.dot(r.direction);
     let b = 2.0 * oc.dot(r.direction);
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    discriminant > 0.0
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2.0 * a)
+    }
 }
 
 fn color(r: &Ray) -> Vec3 {
@@ -18,12 +22,12 @@ fn color(r: &Ray) -> Vec3 {
         y: 0.0,
         z: -1.0,
     };
-    if hit_sphere(sphere_position, 0.5, r) {
-        return Vec3 {
-            x: 1.0,
-            y: 0.0,
-            z: 0.0,
-        };
+    let t = hit_sphere(sphere_position, 0.5, r);
+    if t > 0.0 {
+        let intersection = r.point(t);
+        let mut normal = intersection - sphere_position;
+        normal.normalize();
+        return (normal + 1.0) * 0.5;
     }
     let mut direction = r.direction;
     direction.normalize();
