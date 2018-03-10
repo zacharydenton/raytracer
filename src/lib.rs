@@ -1,7 +1,7 @@
 mod vec3;
-use vec3::Vec3;
+pub use vec3::Vec3;
 mod ray;
-use ray::Ray;
+pub use ray::Ray;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Hit {
@@ -10,7 +10,7 @@ pub struct Hit {
     pub normal: Vec3,
 }
 
-trait Hitable {
+pub trait Hitable {
     fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<Hit>;
 }
 
