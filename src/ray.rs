@@ -2,21 +2,13 @@ use vec3::Vec3;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Ray {
-    pub a: Vec3,
-    pub b: Vec3,
+    pub origin: Vec3,
+    pub direction: Vec3,
 }
 
 impl Ray {
-    fn origin(&self) -> Vec3 {
-        self.a
-    }
-
-    fn direction(&self) -> Vec3 {
-        self.b
-    }
-
-    fn point(&self, t: f64) -> Vec3 {
-        self.a + self.b * t
+    pub fn point(&self, t: f64) -> Vec3 {
+        self.origin + self.direction * t
     }
 }
 
@@ -38,12 +30,12 @@ mod tests {
         };
 
         let r = Ray {
-            a: origin,
-            b: direction,
+            origin: origin,
+            direction: direction,
         };
 
-        assert_eq!(r.origin(), origin);
-        assert_eq!(r.direction(), direction);
+        assert_eq!(r.origin, origin);
+        assert_eq!(r.direction, direction);
     }
 
     #[test]
@@ -60,11 +52,11 @@ mod tests {
         };
 
         let r = Ray {
-            a: origin,
-            b: direction,
+            origin: origin,
+            direction: direction,
         };
 
-        assert_eq!(r.point(0.0), r.origin());
+        assert_eq!(r.point(0.0), r.origin);
         assert_eq!(r.point(1.0), Vec3 {
             x: 1.0,
             y: 1.0,

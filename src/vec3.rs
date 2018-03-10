@@ -8,31 +8,35 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    fn len_squared(&self) -> f64 {
+    pub fn len_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    fn len(&self) -> f64 {
+    pub fn len(&self) -> f64 {
         self.len_squared().sqrt()
     }
 
-    fn normalize(&mut self) {
+    pub fn normalize(&mut self) {
         let len = self.len();
         self.x /= len;
         self.y /= len;
         self.z /= len;
     }
 
-    fn dot(&self, rhs: Self) -> f64 {
+    pub fn dot(&self, rhs: Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    fn cross(&self, rhs: Self) -> Self {
+    pub fn cross(&self, rhs: Self) -> Self {
         Vec3 {
             x: self.y * rhs.z - self.x * rhs.y,
             y: -(self.x * rhs.z) - self.z * rhs.x,
             z: self.x * rhs.y - self.y * rhs.x,
         }
+    }
+
+    pub fn lerp(&self, other: Self, t: f64) -> Self {
+        (*self * (1.0 - t)) + (other * t)
     }
 }
 
@@ -267,21 +271,37 @@ mod tests {
 
     #[test]
     fn has_len_squared() {
-        let v = Vec3 { x: 2.0, y: 3.0, z: 1.0 };
+        let v = Vec3 {
+            x: 2.0,
+            y: 3.0,
+            z: 1.0,
+        };
         assert_eq!(v.len_squared(), 14.0);
     }
 
     #[test]
     fn has_len() {
-        let a = Vec3 { x: 0.5, y: 0.0, z: 0.0 };
+        let a = Vec3 {
+            x: 0.5,
+            y: 0.0,
+            z: 0.0,
+        };
         assert_eq!(a.len(), 0.5);
-        let b = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
+        let b = Vec3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
         assert_eq!(b.len(), 3f64.sqrt());
     }
 
     #[test]
     fn can_be_normalized() {
-        let mut v = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
+        let mut v = Vec3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
         v.normalize();
         assert_eq!(v.len(), 1.0);
         assert_eq!(v.x, v.y);
@@ -291,21 +311,57 @@ mod tests {
 
     #[test]
     fn supports_dot_product() {
-        let a = Vec3 { x: 2.0, y: 3.0, z: -2.0 };
-        let b = Vec3 { x: -5.0, y: 0.5, z: 10.0 };
+        let a = Vec3 {
+            x: 2.0,
+            y: 3.0,
+            z: -2.0,
+        };
+        let b = Vec3 {
+            x: -5.0,
+            y: 0.5,
+            z: 10.0,
+        };
         let dot = a.dot(b);
         assert_eq!(dot, -28.5);
     }
 
     #[test]
     fn supports_cross_product() {
-        let a = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
-        let b = Vec3 { x: -2.0, y: 3.0, z: 0.0 };
+        let a = Vec3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
+        let b = Vec3 {
+            x: -2.0,
+            y: 3.0,
+            z: 0.0,
+        };
         let cross = a.cross(b);
-        assert_eq!(cross, Vec3 {
-            x: -3.0,
-            y: 2.0,
-            z: 5.0,
-        });
+        assert_eq!(
+            cross,
+            Vec3 {
+                x: -3.0,
+                y: 2.0,
+                z: 5.0,
+            }
+        );
+    }
+
+    #[test]
+    fn supports_lerp() {
+        let a = Vec3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
+        let b = Vec3 {
+            x: -2.0,
+            y: 3.0,
+            z: 0.0,
+        };
+        assert_eq!(a.lerp(b, 0.0), a);
+        assert_eq!(a.lerp(b, 1.0), b);
+        assert_eq!(a.lerp(b, 0.5), (a + b) / 2.0);
     }
 }
