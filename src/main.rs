@@ -3,7 +3,28 @@ use vec3::Vec3;
 mod ray;
 use ray::Ray;
 
+fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> bool {
+    let oc = r.origin - center;
+    let a = r.direction.dot(r.direction);
+    let b = 2.0 * oc.dot(r.direction);
+    let c = oc.dot(oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    discriminant > 0.0
+}
+
 fn color(r: &Ray) -> Vec3 {
+    let sphere_position = Vec3 {
+        x: 0.0,
+        y: 0.0,
+        z: -1.0,
+    };
+    if hit_sphere(sphere_position, 0.5, r) {
+        return Vec3 {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+        };
+    }
     let mut direction = r.direction;
     direction.normalize();
     let t = 0.5 * (direction.y + 1.0);

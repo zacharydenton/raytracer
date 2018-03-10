@@ -57,20 +57,29 @@ mod tests {
         };
 
         assert_eq!(r.point(0.0), r.origin);
-        assert_eq!(r.point(1.0), Vec3 {
-            x: 1.0,
-            y: 1.0,
-            z: -1.0,
-        });
-        assert_eq!(r.point(-15.0), Vec3 {
-            x: -15.0,
-            y: -15.0,
-            z: 15.0,
-        });
-        assert_eq!(r.point(0.5), Vec3 {
-            x: 0.5,
-            y: 0.5,
-            z: -0.5,
-        });
+        assert_eq!(
+            r.point(1.0),
+            Vec3 {
+                x: 1.0,
+                y: 1.0,
+                z: -1.0,
+            }
+        );
+        assert_eq!(
+            r.point(-15.0),
+            Vec3 {
+                x: -15.0,
+                y: -15.0,
+                z: 15.0,
+            }
+        );
+        assert_eq!(
+            r.point(0.5),
+            Vec3 {
+                x: 0.5,
+                y: 0.5,
+                z: -0.5,
+            }
+        );
     }
 }
