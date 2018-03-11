@@ -13,6 +13,8 @@ pub use geometry::Geometry;
 #[derive(Debug, PartialEq)]
 pub struct Object {
     pub geometry: Geometry,
+    pub position: Vec3,
+    pub scale: Vec3,
 }
 
 #[derive(Debug)]
@@ -23,17 +25,19 @@ pub struct Scene<'a> {
 struct Intersection<'a> {
     object: &'a Object,
     distance: f64,
+    point: Vec3,
+    normal: Vec3,
 }
 
 impl<'a> Scene<'a> {
     pub fn color<R: Rng>(&self, rng: &mut R, ray: &Ray) -> Vec3 {
         match self.intersect(ray, 0.001, std::f64::MAX) {
             Some(Intersection {
-                object,
-                distance,
+                object: _,
+                distance: _,
+                point,
+                normal,
             }) => {
-                let point = ray.point(distance);
-                let normal = object.geometry.normal(point);
                 let reflection_target = point + normal + random_point_in_unit_sphere(rng);
                 let reflection = Ray {
                     origin: point,
@@ -55,10 +59,20 @@ impl<'a> Scene<'a> {
         self.objects
             .iter()
             .filter_map(|object| {
-                if let Some(distance) = object.geometry.intersection(ray, tmin, tmax) {
+                let transformed_origin = (ray.origin - object.position) / object.scale;
+                let transformed_direction = ray.direction / object.scale;
+                let transformed_ray = Ray { origin: transformed_origin, direction: transformed_direction };
+                if let Some(distance) = object.geometry.intersection(&transformed_ray, tmin, tmax) {
+                    let transformed_point = transformed_ray.point(distance);
+                    let transformed_normal = object.geometry.normal(&transformed_point);
+                    let point = transformed_point * object.scale + object.position;
+                    let mut normal = transformed_normal * object.scale;
+                    normal.normalize();
                     Some(Intersection {
                         object,
-                        distance: distance,
+                        distance,
+                        point,
+                        normal,
                     })
                 } else {
                     None

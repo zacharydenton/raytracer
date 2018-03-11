@@ -3,17 +3,16 @@ use vec3::Vec3;
 
 #[derive(Debug, PartialEq)]
 pub enum Geometry {
-    Sphere { center: Vec3, radius: f64 },
+    Sphere,
 }
 
 impl Geometry {
     pub fn intersection(&self, ray: &Ray, tmin: f64, tmax: f64) -> Option<f64> {
         match self {
-            &Geometry::Sphere { center, radius } => {
-                let oc = ray.origin - center;
-                let a = ray.direction.len_squared();
-                let b = oc.dot(&ray.direction);
-                let c = oc.len_squared() - radius * radius;
+            &Geometry::Sphere => {
+                let a = ray.direction.dot(&ray.direction);
+                let b = ray.origin.dot(&ray.direction);
+                let c = ray.origin.dot(&ray.origin) - 1.0;
                 let discriminant = b * b - a * c;
                 if discriminant > 0.0 {
                     let dsqrt = discriminant.sqrt();
@@ -31,9 +30,9 @@ impl Geometry {
         }
     }
 
-    pub fn normal(&self, point: Vec3) -> Vec3 {
+    pub fn normal(&self, point: &Vec3) -> Vec3 {
         match self {
-            &Geometry::Sphere { center, radius }=> (point - center) / radius,
+            &Geometry::Sphere => point.unit()
         }
     }
 }
@@ -44,7 +43,7 @@ mod tests {
 
     #[test]
     fn sphere_intersection() {
-        let sphere = Geometry::Sphere { center: Vec3(0.0, 0.0, 0.0), radius: 1.0 };
+        let sphere = Geometry::Sphere;
         let origin = Vec3 {
             x: 0.0,
             y: 0.0,
@@ -67,7 +66,7 @@ mod tests {
                     z: -1.0,
                 }
             );
-            let normal = sphere.normal(intersection_point);
+            let normal = sphere.normal(&intersection_point);
             assert_eq!(
                 normal,
                 Vec3 {

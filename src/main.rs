@@ -15,16 +15,14 @@ fn main() {
     };
 
     let sphere = Object {
-        geometry: Geometry::Sphere {
-            center: Vec3(0.0, 0.0, -1.0),
-            radius: 0.5,
-        },
+        position: Vec3(0.0, 0.0, -1.0),
+        scale: Vec3(0.66, 0.5, 0.5),
+        geometry: Geometry::Sphere,
     };
     let ground = Object {
-        geometry: Geometry::Sphere {
-            center: Vec3(0.0, -100.5, -1.0),
-            radius: 100.0,
-        },
+        position: Vec3(0.0, -100.5, -1.0),
+        scale: Vec3(100.0, 100.0, 100.0),
+        geometry: Geometry::Sphere,
     };
 
     let objects = [sphere, ground];
