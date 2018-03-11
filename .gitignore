@@ -7,3 +7,4 @@ Cargo.lock
 *.swo
 
 out.ppm
+out.png

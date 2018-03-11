@@ -26,11 +26,12 @@ fn color(r: &Ray, world: &Hitable) -> Vec3 {
 }
 
 fn main() {
-    let resolution = (200, 100);
-    println!("P3");
-    println!("{} {}", resolution.0, resolution.1);
-    println!("255");
-
+    let resolution = (800, 400);
+    let origin = Vec3 {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
     let lower_left = Vec3 {
         x: -2.0,
         y: -1.0,
@@ -46,11 +47,7 @@ fn main() {
         y: 2.0,
         z: 0.0,
     };
-    let origin = Vec3 {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
+    let camera = Camera { origin, lower_left, horizontal, vertical };
 
     let center = Vec3 {
         x: 0.0,
@@ -72,14 +69,14 @@ fn main() {
         objects: vec![&sphere, &ground],
     };
 
+    println!("P3");
+    println!("{} {}", resolution.0, resolution.1);
+    println!("255");
     for j in (0..resolution.1).rev() {
         for i in 0..resolution.0 {
             let u = i as f64 / resolution.0 as f64;
             let v = j as f64 / resolution.1 as f64;
-            let r = Ray {
-                origin: origin,
-                direction: lower_left + horizontal * u + vertical * v,
-            };
+            let r = camera.ray(u, v);
             let color = color(&r, &world) * 255.0;
             println!(
                 "{} {} {}",

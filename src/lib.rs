@@ -2,6 +2,8 @@ mod vec3;
 pub use vec3::Vec3;
 mod ray;
 pub use ray::Ray;
+mod camera;
+pub use camera::Camera;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Hit {
