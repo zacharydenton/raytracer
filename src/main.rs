@@ -48,8 +48,16 @@ fn main() {
             fuzziness: 0.1,
         },
     };
+    let marble3 = Object {
+        position: Vec3(0.5, -0.32, -0.9),
+        scale: Vec3(0.15, 0.15, 0.15),
+        geometry: Geometry::Sphere,
+        material: Material::Dielectric {
+            refraction_index: 2.4,
+        },
+    };
 
-    let objects = [sphere, ground, marble1, marble2];
+    let objects = [sphere, ground, marble1, marble2, marble3];
     let scene = Scene { objects: &objects };
 
     println!("P3");
