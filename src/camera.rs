@@ -1,7 +1,7 @@
 use vec3::Vec3;
 use ray::Ray;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Camera {
     pub origin: Vec3,
     pub lower_left: Vec3,

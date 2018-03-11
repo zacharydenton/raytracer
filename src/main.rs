@@ -4,83 +4,32 @@ use rand::Rng;
 extern crate raytracer;
 use raytracer::*;
 
-fn color<R: Rng>(rng: &mut R, r: &Ray, world: &Hitable) -> Vec3 {
-    match world.hit(r, 0.0001, std::f64::MAX) {
-        Some(hit) => {
-            let target = hit.point + hit.normal + random_point_in_unit_sphere(rng);
-            let ray = Ray {
-                origin: hit.point,
-                direction: target - hit.point,
-            };
-            return color(rng, &ray, world) * 0.5;
-        }
-        None => {
-            let mut direction = r.direction;
-            direction.normalize();
-            let t = 0.5 * (direction.y + 1.0);
-            let white = Vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
-            };
-            let color = Vec3 {
-                x: 0.5,
-                y: 0.7,
-                z: 1.0,
-            };
-            white.lerp(color, t)
-        }
-    }
-}
-
 fn main() {
     let resolution = (800, 400);
-    let origin = Vec3 {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    let lower_left = Vec3 {
-        x: -2.0,
-        y: -1.0,
-        z: -1.0,
-    };
-    let horizontal = Vec3 {
-        x: 4.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    let vertical = Vec3 {
-        x: 0.0,
-        y: 2.0,
-        z: 0.0,
-    };
-    let camera = Camera {
-        origin,
-        lower_left,
-        horizontal,
-        vertical,
-    };
     let num_samples = 100;
-
-    let center = Vec3 {
-        x: 0.0,
-        y: 0.0,
-        z: -1.0,
+    let camera = Camera {
+        origin: Vec3(0.0, 0.0, 0.0),
+        lower_left: Vec3(-2.0, -1.0, -1.0),
+        horizontal: Vec3(4.0, 0.0, 0.0),
+        vertical: Vec3(0.0, 2.0, 0.0),
     };
-    let radius = 0.5;
-    let sphere = Sphere { center, radius };
-    let ground = Sphere {
-        center: Vec3 {
-            x: 0.0,
-            y: -100.5,
-            z: -1.0,
+
+    let sphere = Object {
+        geometry: Geometry::Sphere {
+            center: Vec3(0.0, 0.0, -1.0),
+            radius: 0.5,
         },
-        radius: 100.0,
+    };
+    let ground = Object {
+        geometry: Geometry::Sphere {
+            center: Vec3(0.0, -100.5, -1.0),
+            radius: 100.0,
+        },
     };
 
-    let world = World {
-        objects: vec![&sphere, &ground],
+    let objects = [sphere, ground];
+    let scene = Scene {
+        objects: &objects,
     };
 
     println!("P3");
@@ -89,25 +38,21 @@ fn main() {
     let mut rng = rand::thread_rng();
     for j in (0..resolution.1).rev() {
         for i in 0..resolution.0 {
-            let mut c = Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            };
+            let mut color = Vec3(0.0, 0.0, 0.0);
             for _ in 0..num_samples {
                 let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
                 let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
-                let r = camera.ray(u, v);
-                c = c + color(&mut rng, &r, &world);
+                let ray = camera.ray(u, v);
+                color = color + scene.color(&mut rng, &ray);
             }
-            c = c / num_samples as f64;
-            c = Vec3 {
-                x: c.x.sqrt(),
-                y: c.y.sqrt(),
-                z: c.z.sqrt(),
+            color = color / num_samples as f64;
+            color = Vec3 {
+                x: color.x.sqrt(),
+                y: color.y.sqrt(),
+                z: color.z.sqrt(),
             };
-            c = c * 255.0;
-            println!("{} {} {}", c.x.round(), c.y.round(), c.z.round());
+            color = color * 255.0;
+            println!("{} {} {}", color.x.round(), color.y.round(), color.z.round());
         }
     }
 }
