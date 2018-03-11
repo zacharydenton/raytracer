@@ -4,10 +4,15 @@ use rand::Rng;
 extern crate raytracer;
 use raytracer::*;
 
-fn color(r: &Ray, world: &Hitable) -> Vec3 {
-    match world.hit(r, 0.0, std::f64::MAX) {
+fn color<R: Rng>(rng: &mut R, r: &Ray, world: &Hitable) -> Vec3 {
+    match world.hit(r, 0.0001, std::f64::MAX) {
         Some(hit) => {
-            return (hit.normal + 1.0) * 0.5;
+            let target = hit.point + hit.normal + random_point_in_unit_sphere(rng);
+            let ray = Ray {
+                origin: hit.point,
+                direction: target - hit.point,
+            };
+            return color(rng, &ray, world) * 0.5;
         }
         None => {
             let mut direction = r.direction;
@@ -93,9 +98,14 @@ fn main() {
                 let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
                 let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
                 let r = camera.ray(u, v);
-                c = c + color(&r, &world);
+                c = c + color(&mut rng, &r, &world);
             }
             c = c / num_samples as f64;
+            c = Vec3 {
+                x: c.x.sqrt(),
+                y: c.y.sqrt(),
+                z: c.z.sqrt(),
+            };
             c = c * 255.0;
             println!("{} {} {}", c.x.round(), c.y.round(), c.z.round());
         }

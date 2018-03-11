@@ -1,3 +1,6 @@
+extern crate rand;
+use rand::Rng;
+
 mod vec3;
 pub use vec3::Vec3;
 mod ray;
@@ -64,6 +67,21 @@ impl<'a> Hitable for World<'a> {
     }
 }
 
+pub fn random_point_in_unit_sphere<R: Rng>(rng: &mut R) -> Vec3 {
+    let mut point: Vec3;
+    loop {
+        point = Vec3 {
+            x: 2.0 * rng.gen::<f64>() - 1.0,
+            y: 2.0 * rng.gen::<f64>() - 1.0,
+            z: 2.0 * rng.gen::<f64>() - 1.0,
+        };
+        if point.len_squared() < 1.0 {
+            break;
+        }
+    }
+    point
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -109,5 +127,14 @@ mod tests {
             direction: -direction,
         };
         assert_eq!(sphere.hit(&ray2, 0.0, 5.0), None);
+    }
+
+    #[test]
+    fn generates_random_points_in_unit_sphere() {
+        let mut rng = rand::thread_rng();
+        for _ in 0..100 {
+            let p = random_point_in_unit_sphere(&mut rng);
+            assert!(p.len_squared() < 1.0);
+        }
     }
 }

@@ -44,39 +44,56 @@ mod tests {
             y: 2.0,
             z: 0.0,
         };
-        let camera = Camera { origin, lower_left, horizontal, vertical };
+        let camera = Camera {
+            origin,
+            lower_left,
+            horizontal,
+            vertical,
+        };
 
-        assert_eq!(camera.ray(0.0, 0.0), Ray {
-            origin,
-            direction: Vec3 {
-                x: -horizontal.x / 2.0,
-                y: -vertical.y / 2.0,
-                z: lower_left.z,
+        assert_eq!(
+            camera.ray(0.0, 0.0),
+            Ray {
+                origin,
+                direction: Vec3 {
+                    x: -horizontal.x / 2.0,
+                    y: -vertical.y / 2.0,
+                    z: lower_left.z,
+                },
             }
-        });
-        assert_eq!(camera.ray(1.0, 0.0), Ray {
-            origin,
-            direction: Vec3 {
-                x: horizontal.x / 2.0,
-                y: -vertical.y / 2.0,
-                z: lower_left.z,
+        );
+        assert_eq!(
+            camera.ray(1.0, 0.0),
+            Ray {
+                origin,
+                direction: Vec3 {
+                    x: horizontal.x / 2.0,
+                    y: -vertical.y / 2.0,
+                    z: lower_left.z,
+                },
             }
-        });
-        assert_eq!(camera.ray(0.0, 1.0), Ray {
-            origin,
-            direction: Vec3 {
-                x: -horizontal.x / 2.0,
-                y: vertical.y / 2.0,
-                z: lower_left.z,
+        );
+        assert_eq!(
+            camera.ray(0.0, 1.0),
+            Ray {
+                origin,
+                direction: Vec3 {
+                    x: -horizontal.x / 2.0,
+                    y: vertical.y / 2.0,
+                    z: lower_left.z,
+                },
             }
-        });
-        assert_eq!(camera.ray(0.5, 0.5), Ray {
-            origin,
-            direction: Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: lower_left.z,
+        );
+        assert_eq!(
+            camera.ray(0.5, 0.5),
+            Ray {
+                origin,
+                direction: Vec3 {
+                    x: 0.0,
+                    y: 0.0,
+                    z: lower_left.z,
+                },
             }
-        });
+        );
     }
 }
