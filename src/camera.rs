@@ -1,15 +1,28 @@
+use std::f64::consts::PI;
 use vec3::Vec3;
 use ray::Ray;
 
 #[derive(Debug, PartialEq)]
 pub struct Camera {
-    pub origin: Vec3,
-    pub lower_left: Vec3,
-    pub horizontal: Vec3,
-    pub vertical: Vec3,
+    origin: Vec3,
+    lower_left: Vec3,
+    horizontal: Vec3,
+    vertical: Vec3,
 }
 
 impl Camera {
+    pub fn new(fov: f64, aspect: f64) -> Self {
+        let theta = fov * PI / 180.0;
+        let half_height = (theta / 2.0).tan();
+        let half_width = aspect * half_height;
+        Camera {
+            origin: Vec3(0.0, 0.0, 0.0),
+            lower_left: Vec3(-half_width, -half_height, -1.0),
+            horizontal: Vec3(2.0 * half_width, 0.0, 0.0),
+            vertical: Vec3(0.0, 2.0 * half_height, 0.0),
+        }
+    }
+
     pub fn ray(&self, u: f64, v: f64) -> Ray {
         Ray {
             origin: self.origin,

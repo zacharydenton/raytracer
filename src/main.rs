@@ -7,12 +7,7 @@ use raytracer::*;
 fn main() {
     let resolution = (800, 400);
     let num_samples = 100;
-    let camera = Camera {
-        origin: Vec3(0.0, 0.0, 0.0),
-        lower_left: Vec3(-2.0, -1.0, -1.0),
-        horizontal: Vec3(4.0, 0.0, 0.0),
-        vertical: Vec3(0.0, 2.0, 0.0),
-    };
+    let camera = Camera::new(100.0, 2.0);
 
     let sphere = Object {
         position: Vec3(0.0, 0.0, -1.0),
