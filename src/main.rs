@@ -36,6 +36,7 @@ fn main() {
         geometry: Geometry::Sphere,
         material: Material::Metal {
             albedo: Vec3(0.8, 0.6, 0.2),
+            fuzziness: 0.3,
         },
     };
     let marble2 = Object {
@@ -44,6 +45,7 @@ fn main() {
         geometry: Geometry::Sphere,
         material: Material::Metal {
             albedo: Vec3(0.8, 0.8, 0.8),
+            fuzziness: 0.1,
         },
     };
 

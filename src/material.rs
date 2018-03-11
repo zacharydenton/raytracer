@@ -7,7 +7,7 @@ use vec3::Vec3;
 #[derive(Debug, PartialEq)]
 pub enum Material {
     Lambertian { albedo: Vec3 },
-    Metal { albedo: Vec3 },
+    Metal { albedo: Vec3, fuzziness: f64 },
 }
 
 impl Material {
@@ -27,10 +27,10 @@ impl Material {
                 };
                 Some((reflection, albedo))
             }
-            &Material::Metal { albedo } => {
+            &Material::Metal { albedo, fuzziness } => {
                 let reflection = Ray {
                     origin: *point,
-                    direction: reflect(&ray.direction.unit(), normal),
+                    direction: reflect(&ray.direction.unit(), normal) + random_point_in_unit_sphere(rng) * fuzziness,
                 };
                 if reflection.direction.dot(normal) > 0.0 {
                     Some((reflection, albedo))
