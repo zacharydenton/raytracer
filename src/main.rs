@@ -1,3 +1,6 @@
+extern crate rand;
+use rand::Rng;
+
 extern crate raytracer;
 use raytracer::*;
 
@@ -5,7 +8,7 @@ fn color(r: &Ray, world: &Hitable) -> Vec3 {
     match world.hit(r, 0.0, std::f64::MAX) {
         Some(hit) => {
             return (hit.normal + 1.0) * 0.5;
-        },
+        }
         None => {
             let mut direction = r.direction;
             direction.normalize();
@@ -47,7 +50,13 @@ fn main() {
         y: 2.0,
         z: 0.0,
     };
-    let camera = Camera { origin, lower_left, horizontal, vertical };
+    let camera = Camera {
+        origin,
+        lower_left,
+        horizontal,
+        vertical,
+    };
+    let num_samples = 100;
 
     let center = Vec3 {
         x: 0.0,
@@ -62,7 +71,7 @@ fn main() {
             y: -100.5,
             z: -1.0,
         },
-        radius: 100.0
+        radius: 100.0,
     };
 
     let world = World {
@@ -72,18 +81,23 @@ fn main() {
     println!("P3");
     println!("{} {}", resolution.0, resolution.1);
     println!("255");
+    let mut rng = rand::thread_rng();
     for j in (0..resolution.1).rev() {
         for i in 0..resolution.0 {
-            let u = i as f64 / resolution.0 as f64;
-            let v = j as f64 / resolution.1 as f64;
-            let r = camera.ray(u, v);
-            let color = color(&r, &world) * 255.0;
-            println!(
-                "{} {} {}",
-                color.x.round(),
-                color.y.round(),
-                color.z.round()
-            );
+            let mut c = Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            };
+            for _ in 0..num_samples {
+                let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
+                let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
+                let r = camera.ray(u, v);
+                c = c + color(&r, &world);
+            }
+            c = c / num_samples as f64;
+            c = c * 255.0;
+            println!("{} {} {}", c.x.round(), c.y.round(), c.z.round());
         }
     }
 }
