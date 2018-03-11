@@ -1,7 +1,7 @@
 extern crate cgmath;
 use cgmath::Vector3;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Ray {
     pub origin: Vector3<f64>,
     pub direction: Vector3<f64>,

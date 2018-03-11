@@ -69,7 +69,7 @@ fn main() {
                 let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
                 let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
                 let ray = camera.ray(u, v);
-                color = color + scene.color(&mut rng, &ray, 0);
+                color = color + scene.color(&mut rng, ray, 0);
             }
             color = color / num_samples as f64;
             color = Vector3::new(

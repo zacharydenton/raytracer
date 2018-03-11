@@ -34,7 +34,7 @@ struct Intersection<'a> {
 }
 
 impl<'a> Scene<'a> {
-    pub fn color<R: Rng>(&self, rng: &mut R, ray: &Ray, depth: u64) -> Vector3<f64> {
+    pub fn color<R: Rng>(&self, rng: &mut R, ray: Ray, depth: u64) -> Vector3<f64> {
         if depth >= 50 {
             return Vector3::new(0.0, 0.0, 0.0);
         }
@@ -46,9 +46,9 @@ impl<'a> Scene<'a> {
                 normal,
             }) => {
                 if let Some((reflection, attenuation)) =
-                    object.material.scatter(rng, ray, &point, &normal)
+                    object.material.scatter(rng, ray, point, normal)
                 {
-                    attenuation.mul_element_wise(self.color(rng, &reflection, depth + 1))
+                    attenuation.mul_element_wise(self.color(rng, reflection, depth + 1))
                 } else {
                     Vector3::new(0.0, 0.0, 0.0)
                 }
@@ -63,7 +63,7 @@ impl<'a> Scene<'a> {
         }
     }
 
-    fn intersect(&self, ray: &Ray, tmin: f64, tmax: f64) -> Option<Intersection> {
+    fn intersect(&self, ray: Ray, tmin: f64, tmax: f64) -> Option<Intersection> {
         self.objects
             .iter()
             .filter_map(|object| {
@@ -74,9 +74,9 @@ impl<'a> Scene<'a> {
                     origin: transformed_origin,
                     direction: transformed_direction,
                 };
-                if let Some(distance) = object.geometry.intersection(&transformed_ray, tmin, tmax) {
+                if let Some(distance) = object.geometry.intersection(transformed_ray, tmin, tmax) {
                     let transformed_point = transformed_ray.point(distance);
-                    let transformed_normal = object.geometry.normal(&transformed_point);
+                    let transformed_normal = object.geometry.normal(transformed_point);
                     let point = transformed_point.mul_element_wise(object.scale) + object.position;
                     let mut normal =
                         (transformed_normal.mul_element_wise(object.scale)).normalize();
