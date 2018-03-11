@@ -1,14 +1,24 @@
+extern crate cgmath;
+use cgmath::Vector3;
+use cgmath::prelude::*;
+
 extern crate rand;
 use rand::Rng;
 
 use ray::Ray;
-use vec3::Vec3;
 
 #[derive(Debug, PartialEq)]
 pub enum Material {
-    Lambertian { albedo: Vec3 },
-    Metal { albedo: Vec3, fuzziness: f64 },
-    Dielectric { refraction_index: f64 },
+    Lambertian {
+        albedo: Vector3<f64>,
+    },
+    Metal {
+        albedo: Vector3<f64>,
+        fuzziness: f64,
+    },
+    Dielectric {
+        refraction_index: f64,
+    },
 }
 
 impl Material {
@@ -16,9 +26,9 @@ impl Material {
         &self,
         rng: &mut R,
         ray: &Ray,
-        point: &Vec3,
-        normal: &Vec3,
-    ) -> Option<(Ray, Vec3)> {
+        point: &Vector3<f64>,
+        normal: &Vector3<f64>,
+    ) -> Option<(Ray, Vector3<f64>)> {
         match self {
             &Material::Lambertian { albedo } => {
                 let target = *point + *normal + random_point_in_unit_sphere(rng);
@@ -31,17 +41,17 @@ impl Material {
             &Material::Metal { albedo, fuzziness } => {
                 let reflection = Ray {
                     origin: *point,
-                    direction: reflect(&ray.direction.unit(), normal)
+                    direction: reflect(&ray.direction.normalize(), normal)
                         + random_point_in_unit_sphere(rng) * fuzziness,
                 };
-                if reflection.direction.dot(normal) > 0.0 {
+                if reflection.direction.dot(*normal) > 0.0 {
                     Some((reflection, albedo))
                 } else {
                     None
                 }
             }
             &Material::Dielectric { refraction_index } => {
-                let attenuation = Vec3(1.0, 1.0, 1.0);
+                let attenuation = Vector3::new(1.0, 1.0, 1.0);
                 let reflection = (
                     Ray {
                         origin: *point,
@@ -50,18 +60,19 @@ impl Material {
                     attenuation,
                 );
 
-                let outward_normal: Vec3;
+                let outward_normal: Vector3<f64>;
                 let ni_over_nt: f64;
                 let reflection_probability: f64;
                 let cosine: f64;
-                if ray.direction.dot(normal) > 0.0 {
+                if ray.direction.dot(*normal) > 0.0 {
                     outward_normal = -*normal;
                     ni_over_nt = refraction_index;
-                    cosine = refraction_index * ray.direction.dot(normal) / ray.direction.len();
+                    cosine =
+                        refraction_index * ray.direction.dot(*normal) / ray.direction.magnitude();
                 } else {
                     outward_normal = *normal;
                     ni_over_nt = 1.0 / refraction_index;
-                    cosine = -ray.direction.dot(normal) / ray.direction.len();
+                    cosine = -ray.direction.dot(*normal) / ray.direction.magnitude();
                 }
 
                 if let Some(refraction) = refract(&ray.direction, &outward_normal, ni_over_nt) {
@@ -85,13 +96,13 @@ impl Material {
     }
 }
 
-fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
-    *vector - *normal * (2.0 * vector.dot(&normal))
+fn reflect(vector: &Vector3<f64>, normal: &Vector3<f64>) -> Vector3<f64> {
+    *vector - *normal * (2.0 * vector.dot(*normal))
 }
 
-fn refract(vector: &Vec3, normal: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
-    let uv = vector.unit();
-    let dt = uv.dot(normal);
+fn refract(vector: &Vector3<f64>, normal: &Vector3<f64>, ni_over_nt: f64) -> Option<Vector3<f64>> {
+    let uv = vector.normalize();
+    let dt = uv.dot(*normal);
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if discriminant > 0.0 {
         Some((uv - *normal * dt) * ni_over_nt - *normal * discriminant.sqrt())
@@ -106,15 +117,15 @@ fn schlick(cosine: f64, refraction_index: f64) -> f64 {
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
 
-fn random_point_in_unit_sphere<R: Rng>(rng: &mut R) -> Vec3 {
-    let mut point: Vec3;
+fn random_point_in_unit_sphere<R: Rng>(rng: &mut R) -> Vector3<f64> {
+    let mut point: Vector3<f64>;
     loop {
-        point = Vec3 {
-            x: 2.0 * rng.gen::<f64>() - 1.0,
-            y: 2.0 * rng.gen::<f64>() - 1.0,
-            z: 2.0 * rng.gen::<f64>() - 1.0,
-        };
-        if point.len_squared() < 1.0 {
+        point = Vector3::new(
+            2.0 * rng.gen::<f64>() - 1.0,
+            2.0 * rng.gen::<f64>() - 1.0,
+            2.0 * rng.gen::<f64>() - 1.0,
+        );
+        if point.magnitude2() < 1.0 {
             break;
         }
     }
@@ -130,7 +141,7 @@ mod tests {
         let mut rng = rand::thread_rng();
         for _ in 0..100 {
             let p = random_point_in_unit_sphere(&mut rng);
-            assert!(p.len_squared() < 1.0);
+            assert!(p.magnitude2() < 1.0);
         }
     }
 }

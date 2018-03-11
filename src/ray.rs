@@ -1,13 +1,14 @@
-use vec3::Vec3;
+extern crate cgmath;
+use cgmath::Vector3;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Ray {
-    pub origin: Vec3,
-    pub direction: Vec3,
+    pub origin: Vector3<f64>,
+    pub direction: Vector3<f64>,
 }
 
 impl Ray {
-    pub fn point(&self, t: f64) -> Vec3 {
+    pub fn point(&self, t: f64) -> Vector3<f64> {
         self.origin + self.direction * t
     }
 }
@@ -18,16 +19,8 @@ mod tests {
 
     #[test]
     fn has_origin_and_direction() {
-        let origin = Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 2.0,
-        };
-        let direction = Vec3 {
-            x: 0.0,
-            y: 1.0,
-            z: -1.0,
-        };
+        let origin = Vector3::new(0.0, 0.0, 2.0);
+        let direction = Vector3::new(0.0, 1.0, -1.0);
 
         let r = Ray {
             origin: origin,
@@ -40,16 +33,8 @@ mod tests {
 
     #[test]
     fn has_point_at_position() {
-        let origin = Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        };
-        let direction = Vec3 {
-            x: 1.0,
-            y: 1.0,
-            z: -1.0,
-        };
+        let origin = Vector3::new(0.0, 0.0, 0.0);
+        let direction = Vector3::new(1.0, 1.0, -1.0);
 
         let r = Ray {
             origin: origin,
@@ -57,29 +42,8 @@ mod tests {
         };
 
         assert_eq!(r.point(0.0), r.origin);
-        assert_eq!(
-            r.point(1.0),
-            Vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: -1.0,
-            }
-        );
-        assert_eq!(
-            r.point(-15.0),
-            Vec3 {
-                x: -15.0,
-                y: -15.0,
-                z: 15.0,
-            }
-        );
-        assert_eq!(
-            r.point(0.5),
-            Vec3 {
-                x: 0.5,
-                y: 0.5,
-                z: -0.5,
-            }
-        );
+        assert_eq!(r.point(1.0), Vector3::new(1.0, 1.0, -1.0,));
+        assert_eq!(r.point(-15.0), Vector3::new(-15.0, -15.0, 15.0,));
+        assert_eq!(r.point(0.5), Vector3::new(0.5, 0.5, -0.5,));
     }
 }

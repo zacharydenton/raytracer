@@ -1,6 +1,9 @@
 extern crate rand;
 use rand::Rng;
 
+extern crate cgmath;
+use cgmath::Vector3;
+
 extern crate raytracer;
 use raytracer::*;
 
@@ -10,42 +13,42 @@ fn main() {
     let camera = Camera::new(100.0, 2.0);
 
     let sphere = Object {
-        position: Vec3(0.0, 0.0, -1.0),
-        scale: Vec3(0.5, 0.5, 0.5),
+        position: Vector3::new(0.0, 0.0, -1.0),
+        scale: Vector3::new(0.5, 0.5, 0.5),
         geometry: Geometry::Sphere,
         material: Material::Lambertian {
-            albedo: Vec3(0.8, 0.3, 0.3),
+            albedo: Vector3::new(0.8, 0.3, 0.3),
         },
     };
     let ground = Object {
-        position: Vec3(0.0, -100.5, -1.0),
-        scale: Vec3(100.0, 100.0, 100.0),
+        position: Vector3::new(0.0, -100.5, -1.0),
+        scale: Vector3::new(100.0, 100.0, 100.0),
         geometry: Geometry::Sphere,
         material: Material::Lambertian {
-            albedo: Vec3(0.8, 0.8, 0.0),
+            albedo: Vector3::new(0.8, 0.8, 0.0),
         },
     };
     let marble1 = Object {
-        position: Vec3(1.0, 0.0, -1.0),
-        scale: Vec3(0.5, 0.5, 0.5),
+        position: Vector3::new(1.0, 0.0, -1.0),
+        scale: Vector3::new(0.5, 0.5, 0.5),
         geometry: Geometry::Sphere,
         material: Material::Metal {
-            albedo: Vec3(0.8, 0.6, 0.2),
+            albedo: Vector3::new(0.8, 0.6, 0.2),
             fuzziness: 0.3,
         },
     };
     let marble2 = Object {
-        position: Vec3(-1.0, 0.0, -1.0),
-        scale: Vec3(0.5, 0.5, 0.5),
+        position: Vector3::new(-1.0, 0.0, -1.0),
+        scale: Vector3::new(0.5, 0.5, 0.5),
         geometry: Geometry::Sphere,
         material: Material::Metal {
-            albedo: Vec3(0.8, 0.8, 0.8),
+            albedo: Vector3::new(0.8, 0.8, 0.8),
             fuzziness: 0.1,
         },
     };
     let marble3 = Object {
-        position: Vec3(0.5, -0.32, -0.9),
-        scale: Vec3(0.15, 0.15, 0.15),
+        position: Vector3::new(0.5, -0.32, -0.9),
+        scale: Vector3::new(0.15, 0.15, 0.15),
         geometry: Geometry::Sphere,
         material: Material::Dielectric {
             refraction_index: 2.4,
@@ -61,7 +64,7 @@ fn main() {
     let mut rng = rand::thread_rng();
     for j in (0..resolution.1).rev() {
         for i in 0..resolution.0 {
-            let mut color = Vec3(0.0, 0.0, 0.0);
+            let mut color = Vector3::new(0.0, 0.0, 0.0);
             for _ in 0..num_samples {
                 let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
                 let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
@@ -69,11 +72,11 @@ fn main() {
                 color = color + scene.color(&mut rng, &ray, 0);
             }
             color = color / num_samples as f64;
-            color = Vec3 {
-                x: color.x.sqrt(),
-                y: color.y.sqrt(),
-                z: color.z.sqrt(),
-            };
+            color = Vector3::new(
+                color.x.sqrt(),
+                color.y.sqrt(),
+                color.z.sqrt(),
+            );
             color = color * 255.0;
             println!(
                 "{} {} {}",
