@@ -9,12 +9,15 @@ mod camera;
 pub use camera::Camera;
 mod geometry;
 pub use geometry::Geometry;
+mod material;
+pub use material::Material;
 
 #[derive(Debug, PartialEq)]
 pub struct Object {
     pub geometry: Geometry,
     pub position: Vec3,
     pub scale: Vec3,
+    pub material: Material,
 }
 
 #[derive(Debug)]
@@ -30,20 +33,24 @@ struct Intersection<'a> {
 }
 
 impl<'a> Scene<'a> {
-    pub fn color<R: Rng>(&self, rng: &mut R, ray: &Ray) -> Vec3 {
+    pub fn color<R: Rng>(&self, rng: &mut R, ray: &Ray, depth: u64) -> Vec3 {
+        if depth >= 50 {
+            return Vec3(0.0, 0.0, 0.0);
+        }
         match self.intersect(ray, 0.001, std::f64::MAX) {
             Some(Intersection {
-                object: _,
+                object,
                 distance: _,
                 point,
                 normal,
             }) => {
-                let reflection_target = point + normal + random_point_in_unit_sphere(rng);
-                let reflection = Ray {
-                    origin: point,
-                    direction: reflection_target - point,
-                };
-                self.color(rng, &reflection) * 0.5
+                if let Some((reflection, attenuation)) =
+                    object.material.scatter(rng, ray, &point, &normal)
+                {
+                    attenuation * self.color(rng, &reflection, depth + 1)
+                } else {
+                    Vec3(0.0, 0.0, 0.0)
+                }
             }
             None => {
                 let direction = ray.direction.unit();
@@ -61,7 +68,10 @@ impl<'a> Scene<'a> {
             .filter_map(|object| {
                 let transformed_origin = (ray.origin - object.position) / object.scale;
                 let transformed_direction = ray.direction / object.scale;
-                let transformed_ray = Ray { origin: transformed_origin, direction: transformed_direction };
+                let transformed_ray = Ray {
+                    origin: transformed_origin,
+                    direction: transformed_direction,
+                };
                 if let Some(distance) = object.geometry.intersection(&transformed_ray, tmin, tmax) {
                     let transformed_point = transformed_ray.point(distance);
                     let transformed_normal = object.geometry.normal(&transformed_point);
@@ -79,34 +89,5 @@ impl<'a> Scene<'a> {
                 }
             })
             .min_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap())
-    }
-}
-
-fn random_point_in_unit_sphere<R: Rng>(rng: &mut R) -> Vec3 {
-    let mut point: Vec3;
-    loop {
-        point = Vec3 {
-            x: 2.0 * rng.gen::<f64>() - 1.0,
-            y: 2.0 * rng.gen::<f64>() - 1.0,
-            z: 2.0 * rng.gen::<f64>() - 1.0,
-        };
-        if point.len_squared() < 1.0 {
-            break;
-        }
-    }
-    point
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn generates_random_points_in_unit_sphere() {
-        let mut rng = rand::thread_rng();
-        for _ in 0..100 {
-            let p = random_point_in_unit_sphere(&mut rng);
-            assert!(p.len_squared() < 1.0);
-        }
     }
 }

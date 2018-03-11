@@ -32,7 +32,7 @@ impl Geometry {
 
     pub fn normal(&self, point: &Vec3) -> Vec3 {
         match self {
-            &Geometry::Sphere => point.unit()
+            &Geometry::Sphere => point.unit(),
         }
     }
 }
