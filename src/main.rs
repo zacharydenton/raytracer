@@ -3,6 +3,7 @@ use rand::Rng;
 
 extern crate cgmath;
 use cgmath::Vector3;
+use cgmath::prelude::*;
 
 extern crate raytracer;
 use raytracer::*;
@@ -10,12 +11,17 @@ use raytracer::*;
 fn main() {
     let resolution = (800, 400);
     let num_samples = 100;
+    let lookfrom = Vector3::new(3.0, 3.0, 2.0);
+    let lookat = Vector3::new(0.0, 0.0, -1.0);
+    let dist_to_focus = (lookfrom - lookat).magnitude();
     let camera = Camera::new(
-        Vector3::new(-2.0, 2.0, 1.0),
-        Vector3::new(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
         Vector3::new(0.0, 1.0, 0.0),
-        90.0,
+        20.0,
         2.0,
+        2.0,
+        dist_to_focus,
     );
 
     let sphere = Object {
@@ -79,7 +85,7 @@ fn main() {
             for _ in 0..num_samples {
                 let u = ((i as f64) + rng.gen::<f64>()) / (resolution.0 as f64);
                 let v = ((j as f64) + rng.gen::<f64>()) / (resolution.1 as f64);
-                let ray = camera.ray(u, v);
+                let ray = camera.ray(&mut rng, u, v);
                 color = color + scene.color(&mut rng, ray, 0);
             }
             color = color / num_samples as f64;

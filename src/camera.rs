@@ -1,6 +1,10 @@
 extern crate cgmath;
 use cgmath::Vector3;
 use cgmath::prelude::*;
+
+extern crate rand;
+use rand::Rng;
+
 use std::f64::consts::PI;
 use ray::Ray;
 
@@ -10,10 +14,23 @@ pub struct Camera {
     lower_left: Vector3<f64>,
     horizontal: Vector3<f64>,
     vertical: Vector3<f64>,
+    u: Vector3<f64>,
+    v: Vector3<f64>,
+    w: Vector3<f64>,
+    lens_radius: f64,
 }
 
 impl Camera {
-    pub fn new(lookfrom: Vector3<f64>, lookat: Vector3<f64>, vup: Vector3<f64>, fov: f64, aspect: f64) -> Self {
+    pub fn new(
+        lookfrom: Vector3<f64>,
+        lookat: Vector3<f64>,
+        vup: Vector3<f64>,
+        fov: f64,
+        aspect: f64,
+        aperture: f64,
+        focus_distance: f64,
+    ) -> Self {
+        let lens_radius = aperture / 2.0;
         let theta = fov * PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
@@ -22,64 +39,38 @@ impl Camera {
         let v = w.cross(u);
         Camera {
             origin: lookfrom,
-            lower_left: lookfrom - u * half_width - v * half_height - w,
-            horizontal: u * 2.0 * half_width,
-            vertical: v * 2.0 * half_height,
+            lower_left: lookfrom - u * focus_distance  *half_width - v * focus_distance * half_height - focus_distance * w,
+            horizontal: u * 2.0 * half_width * focus_distance,
+            vertical: v * 2.0 * half_height * focus_distance,
+            u,
+            v,
+            w,
+            lens_radius,
         }
     }
 
-    pub fn ray(&self, u: f64, v: f64) -> Ray {
+    pub fn ray<R: Rng>(&self, rng: &mut R, u: f64, v: f64) -> Ray {
+        let direction = self.lens_radius * random_point_in_unit_disk(rng);
+        let offset = self.u * direction.x + self.v * direction.y;
         Ray {
-            origin: self.origin,
-            direction: self.lower_left + self.horizontal * u + self.vertical * v - self.origin,
+            origin: self.origin + offset,
+            direction: self.lower_left + self.horizontal * u + self.vertical * v - self.origin - offset,
         }
     }
+}
+
+fn random_point_in_unit_disk<R: Rng>(rng: &mut R) -> Vector3<f64> {
+    let mut point: Vector3<f64>;
+    loop {
+        point = Vector3::new(rng.gen::<f64>() - 1.0, rng.gen::<f64>() - 1.0, 0.0) * 2.0;
+        if point.magnitude2() < 1.0 {
+            break;
+        }
+    }
+    point
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn can_create_rays() {
-        let origin = Vector3::new(0.0, 0.0, 0.0);
-        let lower_left = Vector3::new(-2.0, -1.0, -1.0);
-        let horizontal = Vector3::new(4.0, 0.0, 0.0);
-        let vertical = Vector3::new(0.0, 2.0, 0.0);
-        let camera = Camera {
-            origin,
-            lower_left,
-            horizontal,
-            vertical,
-        };
-
-        assert_eq!(
-            camera.ray(0.0, 0.0),
-            Ray {
-                origin,
-                direction: Vector3::new(-horizontal.x / 2.0, -vertical.y / 2.0, lower_left.z),
-            }
-        );
-        assert_eq!(
-            camera.ray(1.0, 0.0),
-            Ray {
-                origin,
-                direction: Vector3::new(horizontal.x / 2.0, -vertical.y / 2.0, lower_left.z),
-            }
-        );
-        assert_eq!(
-            camera.ray(0.0, 1.0),
-            Ray {
-                origin,
-                direction: Vector3::new(-horizontal.x / 2.0, vertical.y / 2.0, lower_left.z),
-            }
-        );
-        assert_eq!(
-            camera.ray(0.5, 0.5),
-            Ray {
-                origin,
-                direction: Vector3::new(0.0, 0.0, lower_left.z),
-            }
-        );
-    }
 }
