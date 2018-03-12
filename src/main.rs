@@ -13,43 +13,48 @@ fn main() {
     let camera = Camera::new(100.0, 2.0);
 
     let sphere = Object {
-        position: Vector3::new(0.0, 0.0, -1.0),
-        scale: Vector3::new(0.5, 0.5, 0.5),
-        geometry: Geometry::Sphere,
+        geometry: Geometry::Sphere {
+            center: Vector3::new(0.0, 0.0, -1.0),
+            radius: 0.5,
+        },
         material: Material::Lambertian {
             albedo: Vector3::new(0.8, 0.3, 0.3),
         },
     };
     let ground = Object {
-        position: Vector3::new(0.0, -100.5, -1.0),
-        scale: Vector3::new(100.0, 100.0, 100.0),
-        geometry: Geometry::Sphere,
+        geometry: Geometry::Sphere {
+            center: Vector3::new(0.0, -100.5, -1.0),
+            radius: 100.0,
+        }, 
         material: Material::Lambertian {
             albedo: Vector3::new(0.8, 0.8, 0.0),
         },
     };
     let marble1 = Object {
-        position: Vector3::new(1.0, 0.0, -1.0),
-        scale: Vector3::new(0.5, 0.5, 0.5),
-        geometry: Geometry::Sphere,
+        geometry: Geometry::Sphere {
+            center: Vector3::new(1.0, 0.0, -1.0),
+            radius: 0.5,
+        },
         material: Material::Metal {
             albedo: Vector3::new(0.8, 0.6, 0.2),
             fuzziness: 0.3,
         },
     };
     let marble2 = Object {
-        position: Vector3::new(-1.0, 0.0, -1.0),
-        scale: Vector3::new(0.5, 0.5, 0.5),
-        geometry: Geometry::Sphere,
+        geometry: Geometry::Sphere {
+            center: Vector3::new(-1.0, 0.0, -1.0),
+            radius: 0.5,
+        },
         material: Material::Metal {
             albedo: Vector3::new(0.8, 0.8, 0.8),
             fuzziness: 0.1,
         },
     };
     let marble3 = Object {
-        position: Vector3::new(0.5, -0.32, -0.9),
-        scale: Vector3::new(0.15, 0.15, 0.15),
-        geometry: Geometry::Sphere,
+        geometry: Geometry::Sphere {
+            center: Vector3::new(0.5, -0.32, -0.9),
+            radius: 0.15,
+        },
         material: Material::Dielectric {
             refraction_index: 2.4,
         },

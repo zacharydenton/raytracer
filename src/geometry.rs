@@ -5,16 +5,17 @@ use ray::Ray;
 
 #[derive(Debug, PartialEq)]
 pub enum Geometry {
-    Sphere,
+    Sphere { center: Vector3<f64>, radius: f64 },
 }
 
 impl Geometry {
     pub fn intersection(&self, ray: Ray, tmin: f64, tmax: f64) -> Option<f64> {
         match self {
-            &Geometry::Sphere => {
+            &Geometry::Sphere { center, radius } => {
+                let oc = ray.origin - center;
                 let a = ray.direction.dot(ray.direction);
-                let b = ray.origin.dot(ray.direction);
-                let c = ray.origin.dot(ray.origin) - 1.0;
+                let b = oc.dot(ray.direction);
+                let c = oc.dot(oc) - radius * radius;
                 let discriminant = b * b - a * c;
                 if discriminant > 0.0 {
                     let dsqrt = discriminant.sqrt();
@@ -34,7 +35,7 @@ impl Geometry {
 
     pub fn normal(&self, point: Vector3<f64>) -> Vector3<f64> {
         match self {
-            &Geometry::Sphere => point.normalize(),
+            &Geometry::Sphere { center, radius } => (point - center) / radius
         }
     }
 }
@@ -45,7 +46,7 @@ mod tests {
 
     #[test]
     fn sphere_intersection() {
-        let sphere = Geometry::Sphere;
+        let sphere = Geometry::Sphere { center: Vector3::new(0.0, 0.0, 0.0), radius: 1.0 };
         let origin = Vector3::new(0.0, 0.0, -2.5);
         let direction = Vector3::new(0.0, 0.0, 1.0);
         let ray = Ray { origin, direction };

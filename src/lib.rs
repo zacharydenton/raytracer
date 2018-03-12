@@ -16,8 +16,6 @@ pub use material::Material;
 #[derive(Debug, PartialEq)]
 pub struct Object {
     pub geometry: Geometry,
-    pub position: Vector3<f64>,
-    pub scale: Vector3<f64>,
     pub material: Material,
 }
 
@@ -67,19 +65,9 @@ impl<'a> Scene<'a> {
         self.objects
             .iter()
             .filter_map(|object| {
-                let transformed_origin =
-                    (ray.origin - object.position).div_element_wise(object.scale);
-                let transformed_direction = ray.direction.div_element_wise(object.scale);
-                let transformed_ray = Ray {
-                    origin: transformed_origin,
-                    direction: transformed_direction,
-                };
-                if let Some(distance) = object.geometry.intersection(transformed_ray, tmin, tmax) {
-                    let transformed_point = transformed_ray.point(distance);
-                    let transformed_normal = object.geometry.normal(transformed_point);
-                    let point = transformed_point.mul_element_wise(object.scale) + object.position;
-                    let mut normal =
-                        (transformed_normal.mul_element_wise(object.scale)).normalize();
+                if let Some(distance) = object.geometry.intersection(ray, tmin, tmax) {
+                    let point = ray.point(distance);
+                    let normal = object.geometry.normal(point);
                     Some(Intersection {
                         object,
                         distance,
