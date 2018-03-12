@@ -10,7 +10,13 @@ use raytracer::*;
 fn main() {
     let resolution = (800, 400);
     let num_samples = 100;
-    let camera = Camera::new(100.0, 2.0);
+    let camera = Camera::new(
+        Vector3::new(-2.0, 2.0, 1.0),
+        Vector3::new(0.0, 0.0, -1.0),
+        Vector3::new(0.0, 1.0, 0.0),
+        90.0,
+        2.0,
+    );
 
     let sphere = Object {
         geometry: Geometry::Sphere {

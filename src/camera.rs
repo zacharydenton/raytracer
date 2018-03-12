@@ -1,5 +1,6 @@
 extern crate cgmath;
 use cgmath::Vector3;
+use cgmath::prelude::*;
 use std::f64::consts::PI;
 use ray::Ray;
 
@@ -12,15 +13,18 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(fov: f64, aspect: f64) -> Self {
+    pub fn new(lookfrom: Vector3<f64>, lookat: Vector3<f64>, vup: Vector3<f64>, fov: f64, aspect: f64) -> Self {
         let theta = fov * PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
+        let w = (lookfrom - lookat).normalize();
+        let u = vup.cross(w).normalize();
+        let v = w.cross(u);
         Camera {
-            origin: Vector3::new(0.0, 0.0, 0.0),
-            lower_left: Vector3::new(-half_width, -half_height, -1.0),
-            horizontal: Vector3::new(2.0 * half_width, 0.0, 0.0),
-            vertical: Vector3::new(0.0, 2.0 * half_height, 0.0),
+            origin: lookfrom,
+            lower_left: lookfrom - u * half_width - v * half_height - w,
+            horizontal: u * 2.0 * half_width,
+            vertical: v * 2.0 * half_height,
         }
     }
 
