@@ -39,7 +39,8 @@ impl Camera {
         let v = w.cross(u);
         Camera {
             origin: lookfrom,
-            lower_left: lookfrom - u * focus_distance  *half_width - v * focus_distance * half_height - focus_distance * w,
+            lower_left: lookfrom - u * focus_distance * half_width
+                - v * focus_distance * half_height - focus_distance * w,
             horizontal: u * 2.0 * half_width * focus_distance,
             vertical: v * 2.0 * half_height * focus_distance,
             u,
@@ -54,7 +55,8 @@ impl Camera {
         let offset = self.u * direction.x + self.v * direction.y;
         Ray {
             origin: self.origin + offset,
-            direction: self.lower_left + self.horizontal * u + self.vertical * v - self.origin - offset,
+            direction: self.lower_left + self.horizontal * u + self.vertical * v - self.origin
+                - offset,
         }
     }
 }

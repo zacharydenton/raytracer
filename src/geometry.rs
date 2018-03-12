@@ -35,7 +35,7 @@ impl Geometry {
 
     pub fn normal(&self, point: Vector3<f64>) -> Vector3<f64> {
         match self {
-            &Geometry::Sphere { center, radius } => (point - center) / radius
+            &Geometry::Sphere { center, radius } => (point - center) / radius,
         }
     }
 }
@@ -46,7 +46,10 @@ mod tests {
 
     #[test]
     fn sphere_intersection() {
-        let sphere = Geometry::Sphere { center: Vector3::new(0.0, 0.0, 0.0), radius: 1.0 };
+        let sphere = Geometry::Sphere {
+            center: Vector3::new(0.0, 0.0, 0.0),
+            radius: 1.0,
+        };
         let origin = Vector3::new(0.0, 0.0, -2.5);
         let direction = Vector3::new(0.0, 0.0, 1.0);
         let ray = Ray { origin, direction };
