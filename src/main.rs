@@ -155,7 +155,7 @@ fn write_image(colors: &[Vector3<f64>], resolution: (usize, usize)) {
 }
 
 fn main() {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::weak_rng();
     let resolution = (1200, 800);
     let num_samples = 100;
     let lookfrom = Vector3::new(13.0, 2.0, 3.0);
@@ -182,7 +182,7 @@ fn main() {
         let bands: Vec<(usize, &mut [Vector3<f64>])> =
             colors.chunks_mut(resolution.0).enumerate().collect();
         bands.into_par_iter().for_each(|(y, band)| {
-            let mut rng = rand::thread_rng();
+            let mut rng = rand::weak_rng();
             for x in 0..resolution.0 {
                 let mut color = Vector3::new(0.0, 0.0, 0.0);
                 for _ in 0..num_samples {
