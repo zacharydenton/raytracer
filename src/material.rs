@@ -7,7 +7,7 @@ use rand::Rng;
 
 use ray::Ray;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Material {
     Lambertian {
         albedo: Vector3<f64>,

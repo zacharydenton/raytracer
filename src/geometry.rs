@@ -3,7 +3,7 @@ use cgmath::Vector3;
 use cgmath::prelude::*;
 use ray::Ray;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Geometry {
     Sphere { center: Vector3<f64>, radius: f64 },
 }

@@ -13,13 +13,13 @@ pub use geometry::Geometry;
 mod material;
 pub use material::Material;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Object {
     pub geometry: Geometry,
     pub material: Material,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Scene<'a> {
     pub objects: &'a [Object],
 }

@@ -5,4 +5,5 @@ authors = ["Zach Denton <z@chdenton.com>"]
 
 [dependencies]
 cgmath = "0.16.0"
+rayon = "1.0"
 rand = "0.4"

@@ -8,7 +8,7 @@ use rand::Rng;
 use std::f64::consts::PI;
 use ray::Ray;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Camera {
     origin: Vector3<f64>,
     lower_left: Vector3<f64>,
